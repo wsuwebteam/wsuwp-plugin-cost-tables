@@ -1,0 +1,1 @@
+# wsuwp-plugin-cost-tables
