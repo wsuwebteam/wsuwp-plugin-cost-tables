@@ -1,0 +1,17 @@
+{
+	"name": "wsuwp-plugin-cost-tables",
+	"version": "0.0.1",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"start": "wp-scripts start assets/src/settings-page.js assets/src/edit-table.js assets/src/block-editor.js assets/src/front-end.js --output-path=assets/dist/",
+		"build": "wp-scripts build assets/src/settings-page.js assets/src/edit-table.js assets/src/block-editor.js assets/src/front-end.js --output-path=assets/dist/"
+	},
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@wordpress/scripts": "^26.6.0",
+		"@wordpress/url": "^3.36.0",
+		"lodash": "^4.17.21"
+	}
+}

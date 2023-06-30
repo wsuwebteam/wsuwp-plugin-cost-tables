@@ -1,0 +1,79 @@
+$component-class-name: ".wsu-cost-tables";
+
+#{$component-class-name} {
+	margin-bottom: 3rem;
+
+	&:not(.is-loading) {
+		#{$component-class-name}__loading {
+			display: none;
+		}
+	}
+
+	&__filters {
+		display: flex;
+		gap: 0.75rem;
+		margin-bottom: 1.5rem;
+	}
+
+	&__filter {
+		&[class*="--session"] {
+		}
+
+		&[class*="--campus"] {
+		}
+
+		&[class*="--career-path"] {
+		}
+	}
+
+	&__filter-label {
+	}
+
+	&__filter-select {
+	}
+
+	&__table-container {
+	}
+
+	&__error {
+		font-size: 1rem;
+		color: #ca1237;
+		font-style: italic;
+	}
+
+	&__loading {
+		-webkit-animation: spin 1s infinite linear;
+		animation: spin 1s infinite linear;
+		border: 0.25rem solid rgba(113, 113, 113, 0.5);
+		border-radius: 50%;
+		border-top-color: #981e32;
+		height: 2rem;
+		margin: 3rem auto;
+		width: 2rem;
+	}
+
+	// loading indicator
+	@-webkit-keyframes spin {
+		0% {
+			-webkit-transform: rotate(0deg);
+			transform: rotate(0deg);
+		}
+
+		100% {
+			-webkit-transform: rotate(360deg);
+			transform: rotate(360deg);
+		}
+	}
+
+	@keyframes spin {
+		0% {
+			-webkit-transform: rotate(0deg);
+			transform: rotate(0deg);
+		}
+
+		100% {
+			-webkit-transform: rotate(360deg);
+			transform: rotate(360deg);
+		}
+	}
+}
