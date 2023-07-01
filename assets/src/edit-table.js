@@ -5,7 +5,7 @@ jQuery(document).ready(function () {
 
 		function createPanel() {
 			const panelHTML = `
-			<div id="tablepress_edit-table-taxonomies" class="postbox closed">
+			<div id="tablepress_edit-table-taxonomies" class="postbox">
 				<div class="postbox-header">
 				<h2 class="hndle ui-sortable-handle">Cost Table Taxonomies</h2>
 				<div class="handle-actions hide-if-no-js">
