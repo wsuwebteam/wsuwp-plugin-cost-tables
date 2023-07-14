@@ -2,7 +2,8 @@ import "./front-end.scss";
 
 (function () {
 	const CostTable = function (el) {
-		const host = el.dataset.dataSource || WSUWP_DATA.siteUrl || "";
+		const host =
+			el.dataset.dataSource || WSUWP_COST_TABLES_DATA.siteUrl || "";
 		const showSessionFilter = el.dataset.showSessionFilter === "true";
 		const showCampusFilter = el.dataset.showCampusFilter === "true";
 		const showCareerPathFilter = el.dataset.showCareerPathFilter === "true";
@@ -85,12 +86,22 @@ import "./front-end.scss";
 			tableContainer.innerHTML = "";
 			el.classList.add("is-loading");
 
+			const lookupSession = filters.session?.value
+				? filters.session.value
+				: el.dataset.defaultSession;
+			const lookupCampus = filters.campus?.value
+				? filters.campus.value
+				: el.dataset.defaultCampus;
+			const lookupCareerPath = filters.careerPath?.value
+				? filters.careerPath.value
+				: el.dataset.defaultCareerPath;
+
 			const table = tableTaxonomies.find((table) => {
 				return (
 					table.type === el.dataset.defaultType &&
-					table.session === filters.session.value &&
-					table.campus === filters.campus.value &&
-					table.careerPath === filters.careerPath.value
+					table.session === lookupSession &&
+					table.campus === lookupCampus &&
+					table.careerPath === lookupCareerPath
 				);
 			});
 
@@ -199,7 +210,7 @@ import "./front-end.scss";
 
 		function bindEvents() {
 			Object.values(filterControls).forEach(function (filter) {
-				filter.addEventListener("change", function (e) {
+				filter?.addEventListener("change", function (e) {
 					updateTable(filterControls);
 				});
 			});

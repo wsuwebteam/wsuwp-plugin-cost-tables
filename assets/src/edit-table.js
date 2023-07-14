@@ -116,7 +116,7 @@ jQuery(document).ready(function () {
 
 		async function getTableTaxonomies(tableId) {
 			const request = await fetch(
-				WSUWP_DATA.siteUrl +
+				WSUWP_COST_TABLES_DATA.siteUrl +
 					"/wp-json/wsu-cost-tables/v1/get-table-taxonomies?tableId=" +
 					tableId
 			);
@@ -129,7 +129,7 @@ jQuery(document).ready(function () {
 
 		async function getCostTableSettings() {
 			const request = await fetch(
-				WSUWP_DATA.siteUrl +
+				WSUWP_COST_TABLES_DATA.siteUrl +
 					"/wp-json/wsu-cost-tables/v1/get-cost-table-settings"
 			);
 
@@ -150,7 +150,7 @@ jQuery(document).ready(function () {
 			const careerPath = $("#table-tax-career-path").val();
 
 			const response = await fetch(
-				WSUWP_DATA.siteUrl +
+				WSUWP_COST_TABLES_DATA.siteUrl +
 					"/wp-json/wsu-cost-tables/v1/update-table-taxonomies",
 				{
 					method: "POST",

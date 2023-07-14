@@ -99,7 +99,7 @@ class Assets {
 
 	private static function get_inline_wsuwp_data() {
 
-		$script      = 'const WSUWP_DATA = {';
+		$script      = 'var WSUWP_COST_TABLES_DATA = {';
 			$script .= 'siteUrl: "' . site_url() . '",';
 			$script .= 'wpVersion: "' . get_bloginfo( 'version' ) . '",';
 			$script .= '};';

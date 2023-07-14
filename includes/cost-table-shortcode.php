@@ -5,7 +5,7 @@ class WSUWP_Cost_Table_Shortcode {
 
 	public static function display_wsuwp_cost_tables( $attrs ) {
 
-		$script      = 'const WSUWP_DATA = {';
+		$script      = 'var WSUWP_COST_TABLES_DATA = {';
 			$script .= 'siteUrl: "' . site_url() . '",';
 			$script .= 'wpVersion: "' . get_bloginfo( 'version' ) . '",';
 			$script .= '};';
