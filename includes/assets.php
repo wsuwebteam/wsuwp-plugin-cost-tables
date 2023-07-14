@@ -69,10 +69,12 @@ class Assets {
 
 	public static function enqueue_assets( $hook ) {
 
-		if ( 'toplevel_page_tablepress' === $hook ) {
-			$script = self::get_inline_wsuwp_data();
-			wp_add_inline_script( 'wsuwp-plugin-cost-tables-edit-table-scripts', $script, 'before' );
-			wp_enqueue_script( 'wsuwp-plugin-cost-tables-edit-table-scripts' );
+		if ( 1 === (int) get_option( 'wsu_cost_tables_plugin_enable_editing', 0 ) ) {
+			if ( 'toplevel_page_tablepress' === $hook ) {
+				$script = self::get_inline_wsuwp_data();
+				wp_add_inline_script( 'wsuwp-plugin-cost-tables-edit-table-scripts', $script, 'before' );
+				wp_enqueue_script( 'wsuwp-plugin-cost-tables-edit-table-scripts' );
+			}
 		}
 
 	}

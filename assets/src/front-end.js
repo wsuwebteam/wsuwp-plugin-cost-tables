@@ -2,39 +2,18 @@ import "./front-end.scss";
 
 (function () {
 	const CostTable = function (el) {
+		const host = el.dataset.dataSource || WSUWP_DATA.siteUrl || "";
+		const showSessionFilter = el.dataset.showSessionFilter === "true";
+		const showCampusFilter = el.dataset.showCampusFilter === "true";
+		const showCareerPathFilter = el.dataset.showCareerPathFilter === "true";
+		const instanceId = el.dataset.componentId || "";
 		const errorMessage = el.dataset.errorMessage || "";
-		const filterControls = {
-			session: el.querySelector(
-				".wsu-cost-tables__filter--session .wsu-cost-tables__filter-select"
-			),
-			campus: el.querySelector(
-				".wsu-cost-tables__filter--campus .wsu-cost-tables__filter-select"
-			),
-			careerPath: el.querySelector(
-				".wsu-cost-tables__filter--career-path .wsu-cost-tables__filter-select"
-			),
-		};
-		const tableContainer = el.querySelector(
-			".wsu-cost-tables__table-container"
-		);
 
-		let abortController = new AbortController();
+		let tableSettings;
 		let tableTaxonomies;
-
-		async function getTableTaxonomies() {
-			const request = await fetch(
-				WSUWP_DATA.siteUrl +
-					"/wp-json/wsu-cost-tables/v1/get-table-taxonomies"
-			);
-
-			if (request.ok) {
-				const settings = await request.json();
-
-				return convertToArray(settings);
-			}
-
-			throw new Error("Failed to get taxonomy information for tables.");
-		}
+		let filterControls;
+		let tableContainer;
+		let abortController = new AbortController();
 
 		function convertToArray(settings) {
 			const keys = Object.keys(settings);
@@ -45,6 +24,32 @@ import "./front-end.scss";
 					...settings[key],
 				};
 			});
+		}
+
+		async function getTableSettings() {
+			const request = await fetch(
+				host + "/wp-json/wsu-cost-tables/v1/get-cost-table-settings"
+			);
+
+			if (request.ok) {
+				return await request.json();
+			}
+
+			throw new Error("Failed to get cost table setting.");
+		}
+
+		async function getTableTaxonomies() {
+			const request = await fetch(
+				host + "/wp-json/wsu-cost-tables/v1/get-table-taxonomies"
+			);
+
+			if (request.ok) {
+				const response = await request.json();
+
+				return convertToArray(response);
+			}
+
+			throw new Error("Failed to get taxonomy information for tables.");
 		}
 
 		async function getTableContent(table) {
@@ -58,7 +63,7 @@ import "./front-end.scss";
 				const tableId = table.tableId;
 
 				const request = await fetch(
-					WSUWP_DATA.siteUrl +
+					host +
 						"/wp-json/wsu-cost-tables/v1/render-table?tableId=" +
 						tableId.replace("table-", ""),
 					{
@@ -82,6 +87,7 @@ import "./front-end.scss";
 
 			const table = tableTaxonomies.find((table) => {
 				return (
+					table.type === el.dataset.defaultType &&
 					table.session === filters.session.value &&
 					table.campus === filters.campus.value &&
 					table.careerPath === filters.careerPath.value
@@ -93,6 +99,104 @@ import "./front-end.scss";
 			el.classList.remove("is-loading");
 		}
 
+		function getFilterControlContent(
+			label = "",
+			property = "",
+			options = [],
+			defaultValue = ""
+		) {
+			return `
+			<div class="wsu-cost-tables__filter wsu-cost-tables__filter--${property}">
+				<label
+				class="wsu-cost-tables__filter-label"
+				for="wsu-cost-table-filter-${property}-${instanceId}"
+				>${label}</label
+				><select
+				data-property="${property}"
+				class="wsu-cost-tables__filter-select"
+				id="wsu-cost-table-filter-${property}-${instanceId}"
+				>
+				${options.map((option) => {
+					return `<option value="${option.slug}" ${
+						defaultValue === option.slug
+							? 'selected="selected"'
+							: ""
+					}>${option.name}</option>`;
+				})}
+				</select>
+			</div>
+			`;
+		}
+
+		function getFilterControlsContent(tableSettings) {
+			let content = "";
+
+			content += showSessionFilter
+				? getFilterControlContent(
+						"Year/Session",
+						"session",
+						tableSettings.taxonomies.sessions,
+						el.dataset.defaultSession
+				  )
+				: "";
+			content += showCampusFilter
+				? getFilterControlContent(
+						"Campus",
+						"campus",
+						tableSettings.taxonomies.campuses,
+						el.dataset.defaultCampus
+				  )
+				: "";
+			content += showCareerPathFilter
+				? getFilterControlContent(
+						"Career Path",
+						"career-path",
+						tableSettings.taxonomies.careerPaths,
+						el.dataset.defaultCareerPath
+				  )
+				: "";
+
+			return content;
+		}
+
+		function setupTable(tableSettings) {
+			// create html for table
+			const html = `
+				${
+					showSessionFilter ||
+					showCampusFilter ||
+					showCareerPathFilter
+						? `<div class="wsu-cost-tables__filters">
+								${getFilterControlsContent(tableSettings)}
+							</div>`
+						: ""
+				}
+				<div class="wsu-cost-tables__loading"></div>
+				<div class="wsu-cost-tables__table-container"></div>
+			`;
+
+			// set table html content
+			el.innerHTML = html;
+
+			// store dom elements for events
+			return {
+				filterControls: {
+					session: el.querySelector(
+						".wsu-cost-tables__filter--session .wsu-cost-tables__filter-select"
+					),
+					campus: el.querySelector(
+						".wsu-cost-tables__filter--campus .wsu-cost-tables__filter-select"
+					),
+					careerPath: el.querySelector(
+						".wsu-cost-tables__filter--career-path .wsu-cost-tables__filter-select"
+					),
+				},
+				tableContainer: el.querySelector(
+					".wsu-cost-tables__table-container"
+				),
+			};
+		}
+
 		function bindEvents() {
 			Object.values(filterControls).forEach(function (filter) {
 				filter.addEventListener("change", function (e) {
@@ -101,13 +205,22 @@ import "./front-end.scss";
 			});
 		}
 
-		async function init(el) {
+		async function init() {
+			// get needed data
+			tableSettings = await getTableSettings();
 			tableTaxonomies = await getTableTaxonomies();
 
+			// configure DOM
+			({ filterControls, tableContainer } = setupTable(tableSettings));
+
+			// load default table
+			updateTable(filterControls);
+
+			// bind for future events
 			bindEvents();
 		}
 
-		init(el);
+		init();
 	};
 
 	// init cost table instances
