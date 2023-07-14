@@ -5,7 +5,7 @@ jQuery(document).ready(function () {
 
 		function createPanel() {
 			const panelHTML = `
-			<div id="tablepress_edit-table-taxonomies" class="postbox closed">
+			<div id="tablepress_edit-table-taxonomies" class="postbox">
 				<div class="postbox-header">
 				<h2 class="hndle ui-sortable-handle">Cost Table Taxonomies</h2>
 				<div class="handle-actions hide-if-no-js">
@@ -72,6 +72,15 @@ jQuery(document).ready(function () {
 			<table class="tablepress-postbox-table fixed">
 				<tbody>
 					<tr class="bottom-border">
+						<th class="column-1" scope="row"><label for="table-tax-session">Type:</label></th>
+						<td class="column-2">
+							<select id="table-tax-type">
+								<option value=""></option>
+								${getTaxonomyOptions(taxonomies.types, selectedTaxonomies.type)}
+							</select>
+						</td>
+					</tr>
+					<tr class="bottom-border">
 						<th class="column-1" scope="row"><label for="table-tax-session">Session:</label></th>
 						<td class="column-2">
 							<select id="table-tax-session">
@@ -135,6 +144,7 @@ jQuery(document).ready(function () {
 		async function saveTaxonomySettings() {
 			if (!tp.table.id) throw new Error("Table ID must be provided");
 
+			const type = $("#table-tax-type").val();
 			const session = $("#table-tax-session").val();
 			const campus = $("#table-tax-campus").val();
 			const careerPath = $("#table-tax-career-path").val();
@@ -146,6 +156,7 @@ jQuery(document).ready(function () {
 					method: "POST",
 					body: new URLSearchParams({
 						tableId: tp.table.id,
+						type: type,
 						session: session,
 						campus: campus,
 						careerPath: careerPath,

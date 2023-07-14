@@ -26,6 +26,7 @@ class Page_Settings {
 		$settings_data = array();
 
 		$settings_data['placeholders']              = self::normalize_values( $post_data['placeholders'] );
+		$settings_data['taxonomies']['types']       = self::normalize_values( $post_data['types'] );
 		$settings_data['taxonomies']['sessions']    = self::normalize_values( $post_data['sessions'] );
 		$settings_data['taxonomies']['campuses']    = self::normalize_values( $post_data['campuses'] );
 		$settings_data['taxonomies']['careerPaths'] = self::normalize_values( $post_data['careerPaths'] );
@@ -131,6 +132,9 @@ class Page_Settings {
 
 				echo '<h2>Taxonomies</h2>';
 				// echo '<p>This is a test</p>';
+
+				echo '<h3>Types</h3>';
+				self::kvp_group( $settings['taxonomies']['types'], 'types' );
 
 				echo '<h3>Sessions</h3>';
 				self::kvp_group( $settings['taxonomies']['sessions'], 'sessions' );

@@ -24,8 +24,7 @@ jQuery(document).ready(function () {
 				".wsuwp-cost-tables-settings__kvp-group"
 			);
 			const groupLabel = groupContainer.dataset.groupLabel;
-			console.log(groupLabel);
-			console.log(list);
+
 			const template = `
 			<li class="wsuwp-cost-tables-settings__kvp-item">
 			<div class="wsuwp-cost-tables-settings__input-container"><input class="wsuwp-cost-tables-settings__input wsuwp-cost-tables-settings__input--name" type="text" name="settings[${groupLabel}][${key}][name]" value="" placeholder="name" /></div>
