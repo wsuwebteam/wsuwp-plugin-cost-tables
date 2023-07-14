@@ -69,6 +69,11 @@ class Assets {
 
 	public static function enqueue_assets( $hook ) {
 
+		if ( 'post.php' === $hook || 'post-new.php' === $hook ) {
+			$script = self::get_inline_wsuwp_data();
+			wp_add_inline_script( 'wsuwp-plugin-cost-tables-block-editor-scripts', $script, 'before' );
+		}
+
 		if ( 1 === (int) get_option( 'wsu_cost_tables_plugin_enable_editing', 0 ) ) {
 			if ( 'toplevel_page_tablepress' === $hook ) {
 				$script = self::get_inline_wsuwp_data();
