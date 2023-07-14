@@ -8,7 +8,7 @@ const Edit = (props) => {
 
 	const blockClass = "wp-block-wsuwp-cost-tables";
 	const apiPath = "/wp-json/wsu-cost-tables/v1/get-cost-table-settings";
-	const host = attributes.data_source || WSUWP_DATA.siteUrl || "";
+	const host = attributes.data_source || WSUWP_COST_TABLES_DATA.siteUrl || "";
 
 	const { data, isLoading, error } = useFetch(`${host}${apiPath}`);
 
