@@ -72,6 +72,7 @@ class Rest_API {
 		if ( $params['tableId'] ) {
 
 			return isset( $table_taxonomies[ 'table-' . $params['tableId'] ] ) ? $table_taxonomies[ 'table-' . $params['tableId'] ] : array(
+				'type'       => '',
 				'session'    => '',
 				'campus'     => '',
 				'careerPath' => '',
@@ -92,6 +93,7 @@ class Rest_API {
 		$option = get_option( $option_name, array() );
 
 		$option[ 'table-' . $params['tableId'] ] = array(
+			'type'       => $params['type'],
 			'session'    => $params['session'],
 			'campus'     => $params['campus'],
 			'careerPath' => $params['careerPath'],
@@ -108,14 +110,15 @@ class Rest_API {
 		$table_id = isset( $params['tableId'] ) ? $params['tableId'] : null;
 
 		if ( ! $table_id ) {
-			if ( isset( $params['session'] ) && isset( $params['campus'] ) && isset( $params['careerPath'] ) ) {
+			if ( isset( $params['type'] ) && isset( $params['session'] ) && isset( $params['campus'] ) && isset( $params['careerPath'] ) ) {
 				$table_taxonomies = get_option(
 					'tablepress_table_taxonomies',
 					array()
 				);
 
 				foreach ( $table_taxonomies as $key => $taxonomies ) {
-					if ( $taxonomies['session'] === $params['session']
+					if ( $taxonomies['type'] === $params['type']
+						&& $taxonomies['session'] === $params['session']
 						&& $taxonomies['campus'] === $params['campus']
 						&& $taxonomies['careerPath'] === $params['careerPath'] ) {
 

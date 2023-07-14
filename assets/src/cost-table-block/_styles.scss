@@ -29,4 +29,12 @@ $component-class-name: ".wp-block-wsuwp-cost-tables";
 		color: red;
 		font-style: italic;
 	}
+
+	&__api-error {
+		color: red;
+		display: flex;
+		font-style: italic;
+		align-items: center;
+		gap: 0.25em;
+	}
 }
