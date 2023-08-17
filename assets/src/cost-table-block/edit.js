@@ -80,7 +80,7 @@ const Edit = (props) => {
 		if (attributes.initialized === false) {
 			values.initialized = true;
 			values.data_source = defaultDataSource;
-			values.default_campus = "global";
+			values.default_campus = "pullman";
 			values.default_career_path = "undergraduate";
 		}
 
