@@ -71,15 +71,13 @@ class Rest_API {
 			array()
 		);
 
-		if ( $params['tableId'] ) {
-
+		if ( ! empty( $params['tableId'] ) ) {
 			return isset( $table_taxonomies[ 'table-' . $params['tableId'] ] ) ? $table_taxonomies[ 'table-' . $params['tableId'] ] : array(
 				'type'       => '',
 				'session'    => '',
 				'campus'     => '',
 				'careerPath' => '',
 			);
-
 		}
 
 		return $table_taxonomies;
