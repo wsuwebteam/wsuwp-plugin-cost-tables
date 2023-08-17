@@ -154,7 +154,12 @@ jQuery(document).ready(function () {
 					"/wp-json/wsu-cost-tables/v1/update-table-taxonomies",
 				{
 					method: "POST",
-					body: new URLSearchParams({
+					credentials: "include",
+					headers: {
+						"content-type": "application/json",
+						"X-WP-Nonce": wpApiSettings.nonce,
+					},
+					body: JSON.stringify({
 						tableId: tp.table.id,
 						type: type,
 						session: session,
@@ -208,7 +213,7 @@ jQuery(document).ready(function () {
 		}
 
 		function bindEvents() {
-			$(".save-changes-button").on("click", () => {
+			$(".save-changes-button, .button-save-changes").on("click", () => {
 				saveTaxonomySettings();
 			});
 

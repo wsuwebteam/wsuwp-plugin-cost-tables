@@ -112,7 +112,12 @@ class Page_Settings {
 			echo '<div class="notice notice-success"><p>Changes Saved</p></div>';
 		}
 
-		$settings = get_option( self::$option_title, array() );
+		$settings     = get_option( self::$option_title, array() );
+		$placeholders = isset( $settings['placeholders'] ) ? $settings['placeholders'] : array();
+		$types        = isset( $settings['taxonomies']['types'] ) ? $settings['taxonomies']['types'] : array();
+		$sessions     = isset( $settings['taxonomies']['sessions'] ) ? $settings['taxonomies']['sessions'] : array();
+		$campuses     = isset( $settings['taxonomies']['campuses'] ) ? $settings['taxonomies']['campuses'] : array();
+		$career_paths = isset( $settings['taxonomies']['careerPaths'] ) ? $settings['taxonomies']['careerPaths'] : array();
 		?>
 		<div id="js-wsuwp-cost-tables-settings" class="wrap wsuwp-cost-tables-settings">
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
@@ -126,7 +131,7 @@ class Page_Settings {
 
 				echo '<h2>Placeholders</h2>';
 				// echo '<p>This is a test</p>';
-				self::kvp_group( $settings['placeholders'], 'placeholders', '[', ']' );
+				self::kvp_group( $placeholders, 'placeholders', '[', ']' );
 
 				echo '<hr/>';
 
@@ -134,16 +139,16 @@ class Page_Settings {
 				// echo '<p>This is a test</p>';
 
 				echo '<h3>Types</h3>';
-				self::kvp_group( $settings['taxonomies']['types'], 'types' );
+				self::kvp_group( $types, 'types' );
 
 				echo '<h3>Sessions</h3>';
-				self::kvp_group( $settings['taxonomies']['sessions'], 'sessions' );
+				self::kvp_group( $sessions, 'sessions' );
 
 				echo '<h3>Campuses</h3>';
-				self::kvp_group( $settings['taxonomies']['campuses'], 'campuses' );
+				self::kvp_group( $campuses, 'campuses' );
 
 				echo '<h3>Career Paths</h3>';
-				self::kvp_group( $settings['taxonomies']['careerPaths'], 'careerPaths' );
+				self::kvp_group( $career_paths, 'careerPaths' );
 				?>
 
 

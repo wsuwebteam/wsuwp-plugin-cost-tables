@@ -47,7 +47,9 @@ class Rest_API {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( __CLASS__, 'update_table_taxonomies' ),
-				'permission_callback' => '__return_true',
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
 			)
 		);
 
@@ -69,15 +71,13 @@ class Rest_API {
 			array()
 		);
 
-		if ( $params['tableId'] ) {
-
+		if ( ! empty( $params['tableId'] ) ) {
 			return isset( $table_taxonomies[ 'table-' . $params['tableId'] ] ) ? $table_taxonomies[ 'table-' . $params['tableId'] ] : array(
 				'type'       => '',
 				'session'    => '',
 				'campus'     => '',
 				'careerPath' => '',
 			);
-
 		}
 
 		return $table_taxonomies;

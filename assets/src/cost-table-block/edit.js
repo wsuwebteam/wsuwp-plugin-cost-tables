@@ -1,115 +1,169 @@
-const { InspectorControls } = wp.blockEditor;
-const { ToggleControl, SelectControl, PanelBody } = wp.components;
 import { useFetch } from "./hooks";
 import HostControl from "./host-control";
 
-const Edit = (props) => {
-	const { className, attributes, setAttributes } = props;
+const { useBlockProps, InspectorControls } = wp.blockEditor;
+const { ToggleControl, SelectControl, PanelBody } = wp.components;
+const { useEffect, useMemo } = wp.element;
 
+const Edit = (props) => {
+	const { attributes, setAttributes } = props;
+
+	const defaultDataSource = "https://financialaid.wsu.edu";
 	const blockClass = "wp-block-wsuwp-cost-tables";
 	const apiPath = "/wp-json/wsu-cost-tables/v1/get-cost-table-settings";
+	const emptyOptions = [
+		{
+			label: "",
+			value: "",
+		},
+	];
 	const host = attributes.data_source || WSUWP_COST_TABLES_DATA.siteUrl || "";
 
 	const { data, isLoading, error } = useFetch(`${host}${apiPath}`);
 
-	if (isLoading) {
-		return <p>...loading</p>;
+	const taxonomySelectData = useMemo(
+		() =>
+			!!data
+				? {
+						types: data.taxonomies?.types.map((taxonomy) => {
+							return {
+								label: taxonomy.name,
+								value: taxonomy.slug,
+							};
+						}),
+						sessions: data.taxonomies?.sessions.map((taxonomy) => {
+							return {
+								label: taxonomy.name,
+								value: taxonomy.slug,
+							};
+						}),
+						campuses: data.taxonomies?.campuses.map((taxonomy) => {
+							return {
+								label: taxonomy.name,
+								value: taxonomy.slug,
+							};
+						}),
+						careerPaths: data.taxonomies?.careerPaths.map(
+							(taxonomy) => {
+								return {
+									label: taxonomy.name,
+									value: taxonomy.slug,
+								};
+							}
+						),
+				  }
+				: null,
+		[data]
+	);
+
+	function getFirstValue(list) {
+		return list && list[0] && list[0].value ? list[0].value : "";
 	}
 
-	const taxonomySelectData = !!data
-		? {
-				types: data.taxonomies.types.map((taxonomy) => {
-					return { label: taxonomy.name, value: taxonomy.slug };
-				}),
-				sessions: data.taxonomies.sessions.map((taxonomy) => {
-					return { label: taxonomy.name, value: taxonomy.slug };
-				}),
-				campuses: data.taxonomies.campuses.map((taxonomy) => {
-					return { label: taxonomy.name, value: taxonomy.slug };
-				}),
-				careerPaths: data.taxonomies.careerPaths.map((taxonomy) => {
-					return { label: taxonomy.name, value: taxonomy.slug };
-				}),
-		  }
-		: null;
-
-	if (!data || error) {
-		return (
-			<>
-				<p className={`${blockClass}__api-error`}>
-					<span
-						className={`${blockClass}__api-error-icon dashicons dashicons-warning`}
-					></span>
-					Error: something went wrong requesting information from the
-					data source.
-				</p>
-				{getInspectorControls()}
-			</>
-		);
+	function isInOptions(value, options) {
+		return options.some((option) => option.value === value);
 	}
 
-	// set defaults
-	if (attributes.initialized === false) {
-		setAttributes({
-			initialized: true,
-			data_source: "https://financialaid.wsu.edu",
-			default_type: taxonomySelectData.types[0].value,
-			default_session: taxonomySelectData.sessions[0].value,
-			default_campus: "pullman",
-			default_career_path: "undergraduate",
-		});
+	function resolveDefaultValue(field, options, values) {
+		if (
+			Array.isArray(options) &&
+			!isInOptions(attributes[field], options)
+		) {
+			values[field] = getFirstValue(options);
+		}
 	}
+
+	// set defaults ... ugly/complicated I know tell me about it
+	useEffect(() => {
+		const values = {};
+
+		if (attributes.initialized === false) {
+			values.initialized = true;
+			values.data_source = defaultDataSource;
+			values.default_campus = "global";
+			values.default_career_path = "undergraduate";
+		}
+
+		if (taxonomySelectData) {
+			resolveDefaultValue(
+				"default_type",
+				taxonomySelectData.types,
+				values
+			);
+			resolveDefaultValue(
+				"default_session",
+				taxonomySelectData.sessions,
+				values
+			);
+			resolveDefaultValue(
+				"default_campus",
+				taxonomySelectData.campuses,
+				values
+			);
+			resolveDefaultValue(
+				"default_career_path",
+				taxonomySelectData.careerPaths,
+				values
+			);
+		}
+
+		if (Object.keys(values).length > 0) {
+			setAttributes(values);
+		}
+	}, [taxonomySelectData]);
 
 	function getInspectorControls() {
 		return (
 			<>
 				<InspectorControls>
 					<PanelBody title="Cost Table Settings" initialOpen={true}>
-						{taxonomySelectData && (
-							<>
-								<SelectControl
-									label="Table Type"
-									value={attributes.default_type}
-									options={taxonomySelectData.types}
-									onChange={(type) =>
-										setAttributes({ default_type: type })
-									}
-								/>
+						<SelectControl
+							label="Table Type"
+							value={attributes.default_type}
+							options={taxonomySelectData?.types || emptyOptions}
+							onChange={(type) =>
+								setAttributes({ default_type: type })
+							}
+						/>
 
-								<SelectControl
-									label="Default Session"
-									value={attributes.default_session}
-									options={taxonomySelectData.sessions}
-									onChange={(session) =>
-										setAttributes({
-											default_session: session,
-										})
-									}
-								/>
+						<SelectControl
+							label="Default Session"
+							value={attributes.default_session}
+							options={
+								taxonomySelectData?.sessions || emptyOptions
+							}
+							onChange={(session) =>
+								setAttributes({
+									default_session: session,
+								})
+							}
+						/>
 
-								<SelectControl
-									label="Default Campus"
-									value={attributes.default_campus}
-									options={taxonomySelectData.campuses}
-									onChange={(campus) =>
-										setAttributes({
-											default_campus: campus,
-										})
-									}
-								/>
+						<SelectControl
+							label="Default Campus"
+							value={attributes.default_campus}
+							options={
+								taxonomySelectData?.campuses || emptyOptions
+							}
+							onChange={(campus) =>
+								setAttributes({
+									default_campus: campus,
+								})
+							}
+						/>
 
-								<SelectControl
-									label="Default Career Path"
-									value={attributes.default_career_path}
-									options={taxonomySelectData.careerPaths}
-									onChange={(careerPath) =>
-										setAttributes({
-											default_career_path: careerPath,
-										})
-									}
-								/>
-							</>
-						)}
+						<SelectControl
+							label="Default Career Path"
+							value={attributes.default_career_path}
+							options={
+								taxonomySelectData?.careerPaths || emptyOptions
+							}
+							onChange={(careerPath) =>
+								setAttributes({
+									default_career_path: careerPath,
+								})
+							}
+						/>
 
 						<ToggleControl
 							label="Show Year/Session Filter"
@@ -137,7 +191,11 @@ const Edit = (props) => {
 
 						<HostControl
 							label="Data Source"
-							value={attributes.data_source}
+							value={
+								attributes.initialized
+									? attributes.data_source
+									: defaultDataSource
+							}
 							onChange={(data_source) =>
 								setAttributes({ data_source })
 							}
@@ -150,45 +208,69 @@ const Edit = (props) => {
 
 	return (
 		<>
-			<div className={`${blockClass}__filters`}>
-				{attributes.show_session_filter && (
-					<div className={`${blockClass}__filter`}>
-						Year/Session
+			<Wrapper>
+				{isLoading && <p>...loading</p>}
+
+				{!isLoading && (!data || error) && (
+					<p className={`${blockClass}__api-error`}>
 						<span
-							className={`${blockClass}__filter-icon dashicons dashicons-arrow-down-alt2`}
+							className={`${blockClass}__api-error-icon dashicons dashicons-warning`}
 						></span>
-					</div>
+						Error: something went wrong requesting information from
+						the data source.
+					</p>
 				)}
 
-				{attributes.show_campus_filter && (
-					<div className={`${blockClass}__filter`}>
-						Campus
-						<span
-							className={`${blockClass}__filter-icon dashicons dashicons-arrow-down-alt2`}
-						></span>
-					</div>
-				)}
+				{data && (
+					<>
+						<div className={`${blockClass}__filters`}>
+							{attributes.show_session_filter && (
+								<div className={`${blockClass}__filter`}>
+									Year/Session
+									<span
+										className={`${blockClass}__filter-icon dashicons dashicons-arrow-down-alt2`}
+									></span>
+								</div>
+							)}
 
-				{attributes.show_career_path_filter && (
-					<div className={`${blockClass}__filter`}>
-						Career Path
-						<span
-							className={`${blockClass}__filter-icon dashicons dashicons-arrow-down-alt2`}
-						></span>
-					</div>
+							{attributes.show_campus_filter && (
+								<div className={`${blockClass}__filter`}>
+									Campus
+									<span
+										className={`${blockClass}__filter-icon dashicons dashicons-arrow-down-alt2`}
+									></span>
+								</div>
+							)}
+
+							{attributes.show_career_path_filter && (
+								<div className={`${blockClass}__filter`}>
+									Career Path
+									<span
+										className={`${blockClass}__filter-icon dashicons dashicons-arrow-down-alt2`}
+									></span>
+								</div>
+							)}
+						</div>
+						<TablePreview
+							host={host}
+							type={attributes.default_type}
+							session={attributes.default_session}
+							campus={attributes.default_campus}
+							careerPath={attributes.default_career_path}
+						/>
+					</>
 				)}
-			</div>
-			<TablePreview
-				host={host}
-				type={attributes.default_type}
-				session={attributes.default_session}
-				campus={attributes.default_campus}
-				careerPath={attributes.default_career_path}
-			/>
+			</Wrapper>
 
 			{getInspectorControls()}
 		</>
 	);
+};
+
+const Wrapper = (props) => {
+	const blockProps = useBlockProps();
+
+	return <div {...blockProps}>{props.children}</div>;
 };
 
 const TablePreview = (props) => {
