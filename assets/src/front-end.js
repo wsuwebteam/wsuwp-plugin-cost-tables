@@ -221,6 +221,14 @@ import "./front-end.scss";
 			tableSettings = await getTableSettings();
 			tableTaxonomies = await getTableTaxonomies();
 
+			// sort table data by last modified
+			tableTaxonomies.sort(function (a, b) {
+				const aTime = a.lastModified ? a.lastModified : 0;
+				const bTime = b.lastModified ? b.lastModified : 0;
+
+				return bTime - aTime;
+			});
+
 			// configure DOM
 			({ filterControls, tableContainer } = setupTable(tableSettings));
 
