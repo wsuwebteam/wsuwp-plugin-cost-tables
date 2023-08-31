@@ -73,10 +73,11 @@ class Rest_API {
 
 		if ( ! empty( $params['tableId'] ) ) {
 			return isset( $table_taxonomies[ 'table-' . $params['tableId'] ] ) ? $table_taxonomies[ 'table-' . $params['tableId'] ] : array(
-				'type'       => '',
-				'session'    => '',
-				'campus'     => '',
-				'careerPath' => '',
+				'type'         => '',
+				'session'      => '',
+				'campus'       => '',
+				'careerPath'   => '',
+				'lastModified' => null,
 			);
 		}
 
@@ -91,15 +92,40 @@ class Rest_API {
 		$option_name = 'tablepress_table_taxonomies';
 
 		$option = get_option( $option_name, array() );
+		$option = self::remove_deleted_tables( $option );
 
 		$option[ 'table-' . $params['tableId'] ] = array(
-			'type'       => $params['type'],
-			'session'    => $params['session'],
-			'campus'     => $params['campus'],
-			'careerPath' => $params['careerPath'],
+			'type'         => $params['type'],
+			'session'      => $params['session'],
+			'campus'       => $params['campus'],
+			'careerPath'   => $params['careerPath'],
+			'lastModified' => current_datetime()->getTimestamp(),
 		);
 
 		update_option( $option_name, $option, false );
+
+	}
+
+
+	private static function remove_deleted_tables( $table_data ) {
+
+		try {
+			$tablepress_tables    = get_option( 'tablepress_tables', null );
+			$tablepress_table_ids = $tablepress_tables ? get_object_vars( json_decode( $tablepress_tables )->table_post ) : array();
+
+			$table_data = array_filter(
+				$table_data,
+				function ( $key ) use ( $tablepress_table_ids ) {
+					$table_id = str_replace( 'table-', '', $key );
+					return ! is_null( $tablepress_table_ids[ $table_id ] );
+				},
+				ARRAY_FILTER_USE_KEY
+			);
+		} catch ( Exception $ex ) {
+			return $table_data;
+		}
+
+		return $table_data;
 
 	}
 
