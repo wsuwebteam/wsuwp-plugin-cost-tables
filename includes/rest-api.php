@@ -110,14 +110,13 @@ class Rest_API {
 	private static function remove_deleted_tables( $table_data ) {
 
 		try {
-			$tablepress_tables    = get_option( 'tablepress_tables', null );
-			$tablepress_table_ids = $tablepress_tables ? get_object_vars( json_decode( $tablepress_tables )->table_post ) : array();
+			$tablepress_table_ids = \TablePress::$model_table->load_all();
 
 			$table_data = array_filter(
 				$table_data,
 				function ( $key ) use ( $tablepress_table_ids ) {
 					$table_id = str_replace( 'table-', '', $key );
-					return ! is_null( $tablepress_table_ids[ $table_id ] );
+					return in_array( $table_id, $tablepress_table_ids, true );
 				},
 				ARRAY_FILTER_USE_KEY
 			);
